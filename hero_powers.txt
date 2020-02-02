@@ -1,0 +1,30 @@
+procrastinate,Skip your first two turns. Start with two minions from Tavern Tier 3.,true,on turn 3-deal 2 tier 3;on turn 3-set coin 5,None,on turn 1-set coin -2
+i'll take that!,Next combat add a plain copy of the first minion you kill to your hand.,false,on combat end-deal grave enemy 0,1,None
+skilled bartender,Reduce the cost of Tavern Tiers by (1).,true,on tavern upgrade-reduce tavern cost 1,None,None
+hat trick,After you sell a minion randomly give two minions in Bob's Tavern +1/+1,true,on sell minion-give 2 tavern minion +1 +1,None,None
+sharpen blades,Give a minion +1/+1 for each minion you've bought this turn.,false,on target power-give target +buys + buys,1,None
+lead explorer,When you upgrade Bob's Tavern get a 'Recruitment Map'.,true,on tavern upgrade-deal triplereward tier,None,None
+boon of light,Give a friendly minion Divine Shield.,false,on target power-give target divineshield,4,None
+temporal tavern,Refresh Bob's Tavern. Include a minion from a higher Tavern Tier,false,on tavern refresh-add minion tier+1,1,None
+graveyard shift,Take 2 damage and add a Gold Coin to your hand.,false,on hero power-deal coin;on hero power-damage hero 2,0,None
+bloodfury,Give your Demons +1/+1.,false,on hero power-give all demon +1 +1,2,None
+manastorm,Minions cost 2 Gold. Refresh costs 2 Gold. Start with 2 Gold.,true,on minion buy-set coin +1;on tavern refresh-set coin -1,None,on turn 1-set coin 2
+tinker,Mechs in Bob's Tavern have +1 Attack.,true,on tavern refresh-give tavern mech +1 +0,None,on turn 1-give tavern mech +1 +0
+nefarious fire,At the start of next combat, deal 1 damage to all enemy minions.,false,on combat start-damage all enemy 1,1,None
+fire the cannons!,At the start of next combat, deal 4 damage to two random enemy minions.,on combat start-damage 2 enemy 4,1,None
+all patched up,Start with 50 Health instead of 40.,true,None,None,on turn 1-damage self -10
+brick by brick,Give a random friendly minion +3 Health.,false,on hero power-give random minion +0 +3,1,None
+wax warband,Give a random friendly Mech, Demon, Murloc, and Beast +2 Attack,false,on hero power-give random mech +2 +0;on hero power-give random demon +2 +0;on hero power-give random murloc +2 +0;on hero power-give random beast +2 +0,1,None
+die insects!,At the start of next combat deal 8 damage to two random enemy minions.,false,on combat start-damage 2 enemy 8,2,None
+burbling,Your next Battlecry this turn triggers twice.,false,on hero power-double next battlecry,1,None
+stay frosty,At the end of your turn Frozen minions get +1/+1.,true,on combat start-give tavern frozen +1 +1,None,None
+banshee's blessing,Remove a friendly minion. Give adjacent minions +1/+1.,false,on target power-give target left +1 +1;on target power-give target right +1 +1;on target power-destroy target,0,None
+menagerist,Start the game with a 1/1 Amalgam that has all minion types.,true,None,None,on turn 1-summon amalgam
+prestidigitation,Discover a Secret. Put it into the battlefield.,false,on hero power-discover secret,2,None
+reborn rites,At the start of next combat give your right-most minion Reborn.,false,on combat start-give rightmost minion reborn,1,None
+king of beasts,Whenever you buy a Beast, give it +1/+1. Swaps type each turn.,true,on combat start-randomize king power;on beast buy-give buy +1 +1,None,None
+king of mechs,Whenever you buy a Mech, give it +1/+1. Swaps type each turn.,true,on combat start-randomize king power;on mech buy-give buy +1 +1,None,None
+king of murlocs,Whenever you buy a Murloc, give it +1/+1. Swaps type each turn.,true,on combat start-randomize king power;on murloc buy-give buy +1 +1,None,None
+king of demons,Whenever you buy a Demon, give it +1/+1. Swaps type each turn.,true,on combat start-randomize king power;on demon buy-give buy +1 +1,None,None
+honorable warband,Give your minions with no minion type +1/+1.,false,on hero power-give all typeless +1 +1,1,None
+puzzle box,Hire a random minion in Bob's Tavern and give it +1/+1.,false,on hero power-buy random minion;on minion buy-give minion +1 +1,2,None
