@@ -1,8 +1,8 @@
 import board
 import player
 import hero
+from minion import Minion
 
-hero.parse_hero_powers()
-for key in hero.HeroPower.hero_power_dict.keys():
-    print(hero.HeroPower.hero_power_dict[key])
-
+Minion.load_minions()
+for key in Minion.minion_dict.keys():
+    print(Minion.minion_dict[key])
