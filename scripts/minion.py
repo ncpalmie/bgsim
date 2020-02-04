@@ -1,13 +1,16 @@
 import json
+import constant
 
 class Minion(object):
-    minion_dict = None 
+    min_dict = {}
+    gold_min_dict = {}
+    min_pool = []
     def __init__(self, attack, card_class, cost, dbfId, health, m_id, mechanics,
      name, race, rarity, m_set, tech_level, text, m_type):
         self.attack = int(attack)
         self.card_class = card_class
         self.cost = int(cost)
-        self.dbfId = dbfId
+        self.dbf_id = dbfId
         self.health = int(health)
         self.id = m_id
         self.mechanics = mechanics
@@ -18,6 +21,7 @@ class Minion(object):
         self.tech_level = int(tech_level)
         self.text = text
         self.type = m_type
+        self.golden = False
 
         if self.text != None:
             self.text = self.text.replace('\n', ' ')
@@ -37,7 +41,7 @@ class Minion(object):
          dct.get('type', None))
 
     def load_minions():
-        ret_dict = {}
+        minion_list = []
         json_file = open('../config/cards.json', 'r')
         json_text = json_file.read()
         json_file.close()
@@ -46,6 +50,29 @@ class Minion(object):
             if(line[1:7] == 'attack' and 'BATTLEGROUNDS' in line):
                 new_minion = json.loads('{' + line + '}', object_hook=Minion.create_minion)
                 if new_minion.set == 'BATTLEGROUNDS':
-                    ret_dict[new_minion.name] = new_minion
-        Minion.minion_dict = ret_dict
-        
+                    minion_list.append(new_minion)
+        for minion in minion_list:
+            if Minion.min_dict.get(minion.dbf_id, None) == None:
+                Minion.min_dict[minion.dbf_id] = minion
+            elif Minion.min_dict[minion.dbf_id].attack > minion.attack:
+                Minion.min_dict[minion.dbf_id].golden = True
+                Minion.gold_min_dict[minion.dbf_id] = Minion.min_dict[minion.dbf_id]
+                Minion.min_dict[minion.dbf_id] = minion
+            else:
+                Minion.gold_min_dict[minion.dbf_id] = minion
+        Minion.create_minion_pool()        
+
+    def create_minion_pool():
+        for minion in sorted(Minion.min_dict.values(), key=lambda x: x.tech_level):
+            if minion.tech_level == 1:
+                Minion.min_pool.extend([minion.dbf_id] * constant.TIER_1_COPIES)
+            elif minion.tech_level == 2:
+                Minion.min_pool.extend([minion.dbf_id] * constant.TIER_2_COPIES)
+            elif minion.tech_level == 3:
+                Minion.min_pool.extend([minion.dbf_id] * constant.TIER_3_COPIES)
+            elif minion.tech_level == 4:
+                Minion.min_pool.extend([minion.dbf_id] * constant.TIER_4_COPIES)
+            elif minion.tech_level == 5:
+                Minion.min_pool.extend([minion.dbf_id] * constant.TIER_5_COPIES)
+            elif minion.tech_level == 6:
+                Minion.min_pool.extend([minion.dbf_id] * constant.TIER_6_COPIES)

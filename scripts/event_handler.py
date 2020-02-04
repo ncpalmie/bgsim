@@ -2,12 +2,13 @@ import enum
 
 class State(enum.Enum):
     game_start = 0
-    in_tavern = 1
-    exit_tavern = 2
-    enter_combat = 3
-    in_combat = 4
-    exit_combat = 5
-    game_end = 6
+    tavern_start = 1
+    tavern_planning = 2
+    tavern_end = 3
+    combat_start = 4
+    combat = 5
+    combat_end = 6
+    game_end = 7
 
 class Event:
     def __init__(self, act_state, target, subtargets, actions):
