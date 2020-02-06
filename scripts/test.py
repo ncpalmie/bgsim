@@ -13,6 +13,7 @@ dbf_id_list.sort(key=lambda x: Minion.min_dict[x].tech_level)
 tot = 0
 for dbf_id in Minion.min_pool:
     if Minion.min_dict[dbf_id].tech_level == 1:
+        print(Minion.min_dict[dbf_id].name)
         tot += 1
 print("Total: " + str(tot))
 

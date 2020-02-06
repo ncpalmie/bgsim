@@ -4,6 +4,7 @@ import random
 
 class Minion(object):
     min_dict = {}
+    token_dict = {}
     gold_min_dict = {}
     min_pool = []
     def __init__(self, attack, card_class, cost, dbfId, health, m_id, mechanics,
@@ -43,16 +44,18 @@ class Minion(object):
 
     def load_minions():
         minion_list = []
-        json_file = open('../config/cards.json', 'r')
+        json_file = open('../config/bg_cards.json', 'r')
         json_text = json_file.read()
         json_file.close()
-        json_lines = json_text[2:-3].split('},{')
+        json_lines = json_text[2:-2].split('},{')
         for line in json_lines:
-            if('techLevel' in line):
+            if ('techLevel' in line):
                 new_minion = json.loads('{' + line + '}', object_hook=Minion.create_minion)
                 minion_list.append(new_minion)
         for minion in minion_list:
-            if Minion.min_dict.get(minion.dbf_id, None) == None:
+            if minion.id[-1] == 't':
+                Minion.token_dict[minion.dbf_id] = minion
+            elif Minion.min_dict.get(minion.dbf_id, None) == None:
                 Minion.min_dict[minion.dbf_id] = minion
             elif Minion.min_dict[minion.dbf_id].attack > minion.attack:
                 Minion.min_dict[minion.dbf_id].golden = True
