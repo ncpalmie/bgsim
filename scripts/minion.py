@@ -1,5 +1,6 @@
 import json
 import constant
+import random
 
 class Minion(object):
     min_dict = {}
@@ -47,10 +48,9 @@ class Minion(object):
         json_file.close()
         json_lines = json_text[2:-3].split('},{')
         for line in json_lines:
-            if(line[1:7] == 'attack' and 'BATTLEGROUNDS' in line):
+            if('techLevel' in line):
                 new_minion = json.loads('{' + line + '}', object_hook=Minion.create_minion)
-                if new_minion.set == 'BATTLEGROUNDS':
-                    minion_list.append(new_minion)
+                minion_list.append(new_minion)
         for minion in minion_list:
             if Minion.min_dict.get(minion.dbf_id, None) == None:
                 Minion.min_dict[minion.dbf_id] = minion
@@ -76,3 +76,17 @@ class Minion(object):
                 Minion.min_pool.extend([minion.dbf_id] * constant.TIER_5_COPIES)
             elif minion.tech_level == 6:
                 Minion.min_pool.extend([minion.dbf_id] * constant.TIER_6_COPIES)
+
+def get_rand_minion(max_tier):
+    if max_tier == 1:
+        return Minion.min_dict[Minion.min_pool[random.randint(0, constant.TIER_1_TOTAL)]]
+    elif max_tier == 2:
+        return Minion.min_dict[Minion.min_pool[random.randint(0, constant.TIER_1_2_TOTAL)]]
+    elif max_tier == 3:
+        return Minion.min_dict[Minion.min_pool[random.randint(0, constant.TIER_1_3_TOTAL)]]
+    elif max_tier == 4:
+        return Minion.min_dict[Minion.min_pool[random.randint(0, constant.TIER_1_4_TOTAL)]]
+    elif max_tier == 5:
+        return Minion.min_dict[Minion.min_pool[random.randint(0, constant.TIER_1_5_TOTAL)]]
+    else:
+        return Minion.min_dict[Minion.min_pool[random.randint(0, constant.TIER_1_6_TOTAL)]]

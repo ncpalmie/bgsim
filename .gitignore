@@ -3,6 +3,12 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Test config
+cards.json
+
+# Scratch files
+scratch
+
 # C extensions
 *.so
 
