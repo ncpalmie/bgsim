@@ -44,8 +44,8 @@ class Minion(object):
 
     def load_minions():
         minion_list = []
-        json_file = open('../config/bg_cards.json', 'r')
-        json_text = json_file.read()
+        json_file = open('bg_cards.json', 'r')
+        json_text = json_file.read().strip()
         json_file.close()
         json_lines = json_text[2:-2].split('},{')
         for line in json_lines:
@@ -53,16 +53,12 @@ class Minion(object):
                 new_minion = json.loads('{' + line + '}', object_hook=Minion.create_minion)
                 minion_list.append(new_minion)
         for minion in minion_list:
-            if minion.id[-1] == 't':
+            if minion.id[-1] == 't' or minion.id[-1] == 'a':
                 Minion.token_dict[minion.dbf_id] = minion
-            elif Minion.min_dict.get(minion.dbf_id, None) == None:
-                Minion.min_dict[minion.dbf_id] = minion
-            elif Minion.min_dict[minion.dbf_id].attack > minion.attack:
-                Minion.min_dict[minion.dbf_id].golden = True
-                Minion.gold_min_dict[minion.dbf_id] = Minion.min_dict[minion.dbf_id]
-                Minion.min_dict[minion.dbf_id] = minion
-            else:
+            elif 'BaconUps' in minion.id:
                 Minion.gold_min_dict[minion.dbf_id] = minion
+            else:
+                Minion.min_dict[minion.dbf_id] = minion
         Minion.create_minion_pool()        
 
     def create_minion_pool():
