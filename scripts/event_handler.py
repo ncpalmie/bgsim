@@ -31,4 +31,5 @@ class EventHandler:
         event_list = self.events[self.state]
         while len(event_list) > 0:
             #Continue after minions are done
+            pass
         

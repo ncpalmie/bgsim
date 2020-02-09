@@ -31,10 +31,35 @@ class HeroPower(object):
             HeroPower.hp_dict[new_hp.dbf_id] = new_hp
 
 class Hero:
-    hero_dict = None
-    def __init__(self, dbf_id, health, m_id, name, power):
+    hero_dict = {}
+    valid_hero_dbfs = []
+    taken_hero_dbfs = []
+    def __init__(self, dbf_id, health, m_id, name, hp_dbf_id):
+        self.dbf_id = dbf_id
+        self.health = int(health)
+        self.id = m_id
         self.name = name
-        self.power = power
+        self.hp_dbf_id = hp_dbf_id
 
-def parse_heroes():
-    pass 
+    def __repr__(self):
+        return self.name + ' | ' + str(self.dbf_id)
+        
+    def create_hero(dct):
+        return Hero(dct.get('dbfId', None), dct.get('health', None), 
+         dct.get('id', None), dct.get('name', None), dct.get('hp_dbf_id', None))
+
+    def setup_valid_heros():
+        for hero in Hero.hero_dict.values():
+            if hero.name != 'Kel\'Thuzad':
+                Hero.valid_hero_dbfs.append(hero.dbf_id)
+
+    def load_heros():
+        hero_list = []
+        json_file = open('../config/bg_heros.json', 'r')
+        json_text = json_file.read().strip()
+        json_file.close()
+        json_lines = json_text[2:-2].split('},{')
+        for line in json_lines:
+            new_hero = json.loads('{' + line + '}', object_hook=Hero.create_hero)
+            Hero.hero_dict[new_hero.dbf_id] = new_hero
+        Hero.setup_valid_heros()

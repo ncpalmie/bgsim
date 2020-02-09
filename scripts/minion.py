@@ -2,6 +2,18 @@ import json
 import constant
 import random
 
+class BoardMinion():
+    def __init__(self, attack, health, position, minion):
+        self.attack = attack
+        self.health = health
+        self.position = position
+        self.minion = minion
+    
+    def __repr__(self):
+        ret_str = self.minion.name + ' | A: ' + str(self.attack) + ' H: '
+        ret_str += str(self.health) + ' | P: ' + str(self.position)
+        return ret_str
+
 class Minion(object):
     min_dict = {}
     token_dict = {}

@@ -9,6 +9,7 @@ class Player:
         self.minions = []
         self.num_minions = 0
         self.tav_tier = 1
+        self.prev_opponents = [None, None, None]
     
     def __repr__(self):
-        return self.name
+        return self.name + ' playing as ' + self.hero.name
