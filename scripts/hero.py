@@ -1,44 +1,40 @@
-class HeroPower:
-    hero_power_dict = None
-    def __init__(self, name, desc, is_passive, cost):
+import json
+
+class HeroPower(object):
+    hp_dict = {}
+    def __init__(self, cost, dbf_id, m_id, name, text):
+        self.cost = int(cost)
+        self.dbf_id = dbf_id
+        self.id = m_id
         self.name = name
-        self.desc = desc
-        self.action_function = None
-        self.initial_function = None
+        self.text = text
 
-        if cost == 'None':
-            self.cost = None
-        else:
-            self.cost = int(cost)
+        if self.text != None:
+            self.text = self.text.replace('\n', ' ').replace('[x]', '')
+            self.text = self.text.replace('<b>', '').replace('</b>', '')
 
-        if is_passive == 'true':
-            self.is_passive = True
-        else:
-            self.is_passive = False        
-        
     def __repr__(self):
-        ret_string = ""
-        ret_string += self.name + ' | ' + self.desc + ' | Is passive: '
-        ret_string += str(self.is_passive) + ' | Cost: ' + str(self.cost)
-        return ret_string
+        return self.name + ' | ' + self.text
+        
+    def create_hero_power(dct):
+        return HeroPower(dct.get('cost', None), dct.get('dbfId', None), 
+         dct.get('id', None), dct.get('name', None), dct.get('text', None))
+
+    def load_hero_powers():
+        hp_list = []
+        json_file = open('../config/bg_hero_powers.json', 'r')
+        json_text = json_file.read().strip()
+        json_file.close()
+        json_lines = json_text[2:-2].split('},{')
+        for line in json_lines:
+            new_hp = json.loads('{' + line + '}', object_hook=HeroPower.create_hero_power)
+            HeroPower.hp_dict[new_hp.dbf_id] = new_hp
 
 class Hero:
     hero_dict = None
-    def __init__(self, name, power):
+    def __init__(self, dbf_id, health, m_id, name, power):
         self.name = name
         self.power = power
-
-def parse_hero_powers():
-    ret_dict = {}
-    powers_file = open('../config/hero_powers.txt', 'r')
-    powers_lines = powers_file.readlines()
-    for power_line in powers_lines:
-        arguments = power_line.split(',')
-        new_power = HeroPower(arguments[0], arguments[1], arguments[2],
-         arguments[4])
-        ret_dict[arguments[0]] = new_power
-    powers_file.close()
-    HeroPower.hero_power_dict = ret_dict
 
 def parse_heroes():
     pass 

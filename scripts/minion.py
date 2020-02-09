@@ -7,10 +7,9 @@ class Minion(object):
     token_dict = {}
     gold_min_dict = {}
     min_pool = []
-    def __init__(self, attack, card_class, cost, dbfId, health, m_id, mechanics,
-     name, race, rarity, m_set, tech_level, text, m_type):
+    def __init__(self, attack, cost, dbfId, health, m_id, mechanics,
+     name, race, tech_level, text):
         self.attack = int(attack)
-        self.card_class = card_class
         self.cost = int(cost)
         self.dbf_id = dbfId
         self.health = int(health)
@@ -18,11 +17,8 @@ class Minion(object):
         self.mechanics = mechanics
         self.name = name
         self.race = race
-        self.rarity = rarity
-        self.set = m_set 
         self.tech_level = int(tech_level)
         self.text = text
-        self.type = m_type
         self.golden = False
 
         if self.text != None:
@@ -35,16 +31,14 @@ class Minion(object):
         return ret_string
         
     def create_minion(dct):
-        return Minion(dct.get('attack', None), dct.get('cardClass', None), 
-         dct.get('cost', None), dct.get('dbfId', None), dct.get('health', None), 
-         dct.get('id', None), dct.get('mechanics', None), dct.get('name', None),
-         dct.get('race', None), dct.get('rarity', None), dct.get('set', None), 
-         dct.get('techLevel', None), dct.get('text', None), 
-         dct.get('type', None))
+        return Minion(dct.get('attack', None), dct.get('cost', None), 
+         dct.get('dbfId', None), dct.get('health', None), dct.get('id', None),
+         dct.get('mechanics', None), dct.get('name', None), dct.get('race', None),
+         dct.get('techLevel', None), dct.get('text', None))
 
     def load_minions():
         minion_list = []
-        json_file = open('bg_cards.json', 'r')
+        json_file = open('../config/bg_cards.json', 'r')
         json_text = json_file.read().strip()
         json_file.close()
         json_lines = json_text[2:-2].split('},{')
