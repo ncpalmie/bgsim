@@ -34,9 +34,9 @@ while(True):
     input()
     events.setup_next_opponents()
     for player in Player.player_dict.values():
-        print_str = player.name + ' fights with ' + Player.player_dict[player.next_opponent].name
-        print_str += ' | ' + str(player.prev_opponents)
-        if not player.next_opponent in player.prev_opponents[1:]:
+        print_str = player.name + ' fights with ' + Player.player_dict[player.next_opp].name
+        print_str += ' | ' + str(player.prev_opps)
+        if not player.next_opp in player.prev_opps[1:]:
             print_str += ' | CORRECT'
         else:
             print_str += ' | INCORRECT'

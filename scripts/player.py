@@ -11,8 +11,8 @@ class Player:
         self.minions = []
         self.num_minions = 0
         self.tav_tier = 1
-        self.prev_opponents = [None, None, None]
-        self.next_opponent = None
+        self.prev_opps = [None, None, None]
+        self.next_opp = None
         self.id = Player.p_id
         Player.p_id += 1
     

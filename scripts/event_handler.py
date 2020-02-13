@@ -62,47 +62,44 @@ def setup_ai_players(num_ai):
         del Hero.valid_hero_dbfs[hero_index]
         new_player = Player('AIPlayer_' + str(Player.p_id), Hero.hero_dict[hero_dbf])
         Player.player_dict[new_player.id] = new_player
-    
-def find_ideal_opponent(player_id, players_assigned):
-    player = Player.player_dict[player_id]
-    player_id_set = set(Player.player_dict.keys())
-    if player.prev_opponents[1] == None:
-        invalid_players = players_assigned | set(player.prev_opponents) 
-        valid_players = list(player_id_set - invalid_players)
-        return valid_players[random.randint(0, len(valid_players) - 1)]
 
-    unassigned = player_id_set - players_assigned
-    if len(unassigned) == 1:
-        return list(unassigned)[0] 
-    rand_opp_id = random.choice(tuple(unassigned))
-    rand_opp_1 = Player.player_dict[rand_opp_id]
-    rand_opp_id = random.choice(tuple(unassigned))
-    rand_opp_2 = Player.player_dict[rand_opp_id]
-    opt_choices = set(rand_opp_1.prev_opponents) | set(rand_opp_2.prev_opponents)
-    best_opts = opt_choices - (players_assigned | set(player.prev_opponents))
-    if len(best_opts) == 0:
-        return random.choice(tuple(player_id_set - (players_assigned | set(player.prev_opponents))))
-    else:
-        return random.choice(tuple(best_opts))
+def get_allowed_opps(player_id, players_assigned):
+    player = Player.player_dict[player_id]
+    player_ids = set(Player.player_dict.keys())
+    return player_ids - (set(player.prev_opps) | players_assigned)
+    
+def check_match_valid(opp_id, players_assigned):
+    player_ids = Player.player_dict.keys()
+    players_assigned.add(opp_id)
+    unpaired_opps = set(player_ids) - players_assigned
+    for opp in unpaired_opps:
+        if len(get_allowed_opps(opp, players_assigned)) == 0:
+            players_assigned.remove(opp_id)
+            return False
+    return True
     
 
 def setup_next_opponents():
     players_assigned = set()
-    for player_id in Player.player_dict.keys():
-        if not player_id in players_assigned:
-            players_assigned.add(player_id)
-            opp_id = find_ideal_opponent(player_id, players_assigned)
+    player_ids = Player.player_dict.keys()
+    for player_id in player_ids:
+        if player_id in players_assigned:
+            continue
+        players_assigned.add(player_id)
+        allowed_opps = get_allowed_opps(player_id, players_assigned)
+        for opp_id in allowed_opps:
+            if check_match_valid(opp_id, players_assigned):
+                player = Player.player_dict[player_id]
+                opp = Player.player_dict[opp_id]
+                player.prev_opps.insert(0, opp_id)
+                opp.prev_opps.insert(0, player_id)
+                del player.prev_opps[-1]
+                del opp.prev_opps[-1]
+                player.next_opp = opp_id
+                opp.next_opp = player_id
+                break
+        
 
-            #Setup iterated player information
-            Player.player_dict[player_id].prev_opponents.insert(0, opp_id)
-            del Player.player_dict[player_id].prev_opponents[-1]
-            Player.player_dict[player_id].next_opponent = opp_id
-
-            #Setup chosen player information
-            Player.player_dict[opp_id].prev_opponents.insert(0, player_id)
-            del Player.player_dict[opp_id].prev_opponents[-1]
-            Player.player_dict[opp_id].next_opponent = player_id
-            
-            players_assigned.add(opp_id)
-            
+        
+        
         
