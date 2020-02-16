@@ -1,6 +1,7 @@
 class Player:
     p_id = 0
-    player_dict = {}
+    players = {}
+    kelthuzad = None
     def __init__(self, name, hero):
         self.name = name
         self.hero = hero
@@ -11,7 +12,7 @@ class Player:
         self.minions = []
         self.num_minions = 0
         self.tav_tier = 1
-        self.prev_opps = [None, None, None]
+        self.prev_opps = [None, None]
         self.next_opp = None
         self.id = Player.p_id
         Player.p_id += 1
@@ -20,6 +21,8 @@ class Player:
         return self.name + ' playing as ' + self.hero.name
     
     def __eq__(self, other):
+        if other == None:
+            return False
         return self.name == other.name
 
     def __hash__(self):

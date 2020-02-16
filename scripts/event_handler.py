@@ -1,5 +1,6 @@
 import enum
 import random
+import constant
 from hero import Hero
 from player import Player
 
@@ -52,7 +53,7 @@ def setup_human_players(num_humans):
     
         new_player = Player('HuPlayer_' + str(Player.p_id), 
          Hero.hero_dict[hero_choices[chosen_index]])
-        Player.player_dict[new_player.id] = new_player
+        Player.players[new_player.id] = new_player
     
 def setup_ai_players(num_ai):
     for i in range(num_ai):
@@ -61,45 +62,44 @@ def setup_ai_players(num_ai):
         Hero.taken_hero_dbfs.append(hero_dbf)
         del Hero.valid_hero_dbfs[hero_index]
         new_player = Player('AIPlayer_' + str(Player.p_id), Hero.hero_dict[hero_dbf])
-        Player.player_dict[new_player.id] = new_player
+        Player.players[new_player.id] = new_player
+    #Add Kel'Thuzad to list
+    new_player = Player('Kel\'Thuzad', Hero.hero_dict[constant.KELTHUZAD_ID])
+    new_player.id = -1
+    Player.kelthuzad = new_player
 
-def get_allowed_opps(player_id, players_assigned):
-    player = Player.player_dict[player_id]
-    player_ids = set(Player.player_dict.keys())
-    return player_ids - (set(player.prev_opps) | players_assigned)
-    
-def check_match_valid(opp_id, players_assigned):
-    player_ids = Player.player_dict.keys()
-    players_assigned.add(opp_id)
-    unpaired_opps = set(player_ids) - players_assigned
-    for opp in unpaired_opps:
-        if len(get_allowed_opps(opp, players_assigned)) == 0:
-            players_assigned.remove(opp_id)
-            return False
-    return True
-    
+def get_player_opts(player_id, players_assigned):
+    player_opts = set(Player.players.keys())
+    invalid_opts = players_assigned | set(Player.players[player_id].prev_opps)
+    invalid_opts.add(player_id)
+    return list(player_opts - invalid_opts)
+
+def setup_match(player_id, opp_id):
+    player = Player.players[player_id]
+    opp = Player.players[opp_id]
+    player.prev_opps.insert(0, opp_id)
+    player.next_opp = opp_id
+    opp.prev_opps.insert(0, player_id)
+    opp.next_opp = player_id
+    del player.prev_opps[-1]
+    del opp.prev_opps[-1]
 
 def setup_next_opponents():
     players_assigned = set()
-    player_ids = Player.player_dict.keys()
-    for player_id in player_ids:
+    player_ids = list(Player.players.keys())
+    if len(player_ids) == 2:
+        setup_match(player_ids[0], player_ids[1])
+        return
+    while len(players_assigned) != len(Player.players.keys()):
+        player_id = sorted(player_ids, key=lambda x: len(get_player_opts(x, 
+         players_assigned)))[0]
         if player_id in players_assigned:
+            player_ids.remove(player_id)
             continue
+        player_opts = get_player_opts(player_id, players_assigned)
+        opp_id = player_opts[random.randint(0, len(player_opts) - 1)]
+        setup_match(player_id, opp_id)
         players_assigned.add(player_id)
-        allowed_opps = get_allowed_opps(player_id, players_assigned)
-        for opp_id in allowed_opps:
-            if check_match_valid(opp_id, players_assigned):
-                player = Player.player_dict[player_id]
-                opp = Player.player_dict[opp_id]
-                player.prev_opps.insert(0, opp_id)
-                opp.prev_opps.insert(0, player_id)
-                del player.prev_opps[-1]
-                del opp.prev_opps[-1]
-                player.next_opp = opp_id
-                opp.next_opp = player_id
-                break
-        
-
-        
+        players_assigned.add(opp_id)
         
         
