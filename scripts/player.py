@@ -1,7 +1,5 @@
 class Player:
     p_id = 0
-    players = {}
-    kelthuzad = None
     def __init__(self, name, hero):
         self.name = name
         self.hero = hero

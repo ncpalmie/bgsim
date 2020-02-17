@@ -1,8 +1,7 @@
 import random
 import constant
-import event_handler as events
 from player import Player
-from event_handler import EventHandler
+from controllers import EventHandler
 from minion import Minion
 from hero import Hero, HeroPower
 
@@ -21,12 +20,10 @@ else:
     print('Input number of human players: ')
     num_humans = int(input())
 
-if not all_ai:
-    events.setup_human_players(num_humans)
+event_handler = EventHandler()
+event_handler.setup_all_players(num_humans, num_players - num_humans)
 
-events.setup_ai_players(num_players - num_humans)
-
-for player in Player.players.values():
+for player in event_handler.players.values():
     print(player)
 
 #kelth = Player('KTPlayer_' + str(Player.p_id), Hero.hero_dict[constant.KELTHUZAD_ID])
@@ -38,14 +35,14 @@ while(True):
     kill_num = input()
     if len(kill_num) > 0:
         kill_num = int(kill_num)
-        del Player.players[kill_num]
-        if Player.players.get(-1, None) == None and len(Player.players.keys()) % 2 != 0:
-            Player.players[-1] = Player.kelthuzad
+        del event_handler.players[kill_num]
+        if event_handler.players.get(-1, None) == None and len(event_handler.players.keys()) % 2 != 0:
+            event_handler.players[-1] = event_handler.kelthuzad
         else:
-            del Player.players[-1]
-    events.setup_next_opponents()
-    for player in Player.players.values():
-        print_str = player.name + ' fights with ' + Player.players[player.next_opp].name
+            del event_handler.players[-1]
+    event_handler.matchmaker.setup_next_opponents()
+    for player in event_handler.players.values():
+        print_str = player.name + ' fights with ' + event_handler.players[player.next_opp].name
         print_str += ' | ' + str(player.prev_opps)
         if not player.next_opp in player.prev_opps[1:]:
             print_str += ' | CORRECT'
@@ -53,5 +50,4 @@ while(True):
             print_str += ' | INCORRECT'
         print(print_str)
 
-event_handler = EventHandler()
 
