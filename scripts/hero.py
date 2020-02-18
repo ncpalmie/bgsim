@@ -63,3 +63,12 @@ class Hero:
             new_hero = json.loads('{' + line + '}', object_hook=Hero.create_hero)
             Hero.hero_dict[new_hero.dbf_id] = new_hero
         Hero.setup_valid_heros()
+
+    def pull_heroes(num_heroes):
+        hero_dbfs = []
+        for i in range(num_heroes):
+            new_dbf = valid_hero_dbfs[random.randint(0, len(valid_hero_dbfs)) - 1]
+            hero_dbfs.append(new_dbf)
+            taken_hero_dbfs.append(new_dbf)
+            valid_hero_dbfs.remove(new_dbf)
+        return hero_dbfs

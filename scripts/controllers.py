@@ -1,6 +1,8 @@
 import enum
+import ray
 import random
 import constant
+from client import Client
 from hero import Hero
 from player import Player
 
@@ -28,6 +30,7 @@ class EventHandler:
             self.events[_state.value] = []
         self.state = State.game_start
         self.players = {}
+        self.clients = {}
         self.kelthuzad = None
         self.matchmaker = None
 
@@ -40,10 +43,13 @@ class EventHandler:
             #Continue after minions are done
             pass
  
-    def setup_all_players(self, num_humans, num_ai):    
-        if num_humans > 0:
-            self.setup_human_players(num_humans)
-        self.setup_ai_players(num_ai)
+    def setup_clients(self, num_humans, num_ai):    
+        for i in range(num_humans):
+            client = Client.remote(False)        
+            client.test.remote()
+            client.initiate_player.remote()
+            self.players[client.id] = client.player
+            self.clients[client.id] = client 
         self.matchmaker = Matchmaker(self.players)
 
     def setup_human_players(self, num_humans):
