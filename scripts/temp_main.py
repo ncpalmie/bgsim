@@ -1,31 +1,8 @@
 import ray, time
-from client import Client
+from t_client import Client
 from datetime import datetime
 ray.init()
 
-@ray.remote
-class Client(object):
-    def __init__(self, ai):
-        self.x = 0
-        self.status = 'Unready'
-        self.ai = ai
-    
-    def inc(self):
-        self.x += 1
-    
-    def get_value(self):
-        return self.x
-
-    def ready_up(self, string):
-        if self.ai:
-            time.sleep(2)
-            self.status = string + str(datetime.now())
-        else:
-            input()
-            self.status = string + str(datetime.now())
-
-    def get_status(self):
-        return self.status
 
 # Create an actor process.
 clients = []

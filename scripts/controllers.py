@@ -42,14 +42,22 @@ class EventHandler:
         while len(event_list) > 0:
             #Continue after minions are done
             pass
- 
-    def setup_clients(self, num_humans, num_ai):    
-        for i in range(num_humans):
-            client = Client.remote(False)        
-            client.test.remote()
-            client.initiate_player.remote()
-            self.players[client.id] = client.player
-            self.clients[client.id] = client 
+    
+    def setup_clients(self, num_clients, is_ai):
+        for i in range(num_clients):
+            client = Client.remote(is_ai, Player.p_id)
+            c_id = Player.p_id 
+            client_hero = client.select_hero.remote(Hero.pull_heroes(3))
+            if is_ai:
+                name = 'AIPlayer_' + str(c_id)
+            else:
+                name = 'HuPlayer_' + str(c_id)
+            self.players[c_id] = Player(name, Hero.heroes[ray.get(client_hero)])
+            self.clients[c_id] = client
+
+    def setup_players(self, num_humans, num_ai):    
+        self.setup_clients(num_humans, False)
+        self.setup_clients(num_ai, True)
         self.matchmaker = Matchmaker(self.players)
 
     def setup_human_players(self, num_humans):
