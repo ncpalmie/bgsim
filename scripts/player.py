@@ -1,15 +1,22 @@
+from tavern import Tavern
+
 class Player:
     p_id = 0
     def __init__(self, name, hero):
         self.name = name
         self.hero = hero
+        
+        if self.name[0] == 'H':
+            self.is_ai = False
+        else:
+            self.is_ai = True
         self.coins = 3
         self.health = 0
         self.triples = 0
         self.winstreak = 0
         self.minions = []
         self.num_minions = 0
-        self.tav_tier = 1
+        self.tavern = Tavern()
         self.prev_opps = [None, None]
         self.next_opp = None
         self.id = Player.p_id

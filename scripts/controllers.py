@@ -1,10 +1,12 @@
-import enum
 import ray
-import random
 import constant
+import time, math, random, enum
+import minion as mn
 from client import Client
 from hero import Hero
 from player import Player
+from event import Event, Event_Type
+from minion import Minion
 
 class State(enum.Enum):
     game_start = 0
@@ -16,13 +18,6 @@ class State(enum.Enum):
     combat_end = 6
     game_end = 7
 
-class Event:
-    def __init__(self, act_state, target, subtargets, actions):
-        self.act_state = act_state
-        self.target = target
-        self.subtargets = subtargets
-        self.actions = actions
-
 class EventHandler:
     def __init__(self):
         self.events = {}
@@ -31,18 +26,55 @@ class EventHandler:
         self.state = State.game_start
         self.players = {}
         self.clients = {}
+        self.round = 0
         self.kelthuzad = None
         self.matchmaker = None
 
     def enter_next_state(self):
-        self.state += 1
+        self.state = State(self.state.value + 1)
     
-    def perform_next_event(self):
-        event_list = self.events[self.state]
+    def handle_events(self):
+        event_list = self.events[self.state.value]
         while len(event_list) > 0:
             #Continue after minions are done
+            event_list.pop(0)
             pass
-    
+
+    def run_state(self, args_list=[]):
+        if self.state == State.game_start:
+            #Arg 1: Number of human players
+            #Arg 2: Number of AI players
+            self.setup_players(args_list[0], args_list[1])
+        elif self.state == State.tavern_start:
+            for player in self.players.values():
+                tav = player.tavern
+                if tav.frozen:
+                    continue
+                num_offered = math.ceil(tav.tier / 2) + constant.OFFERED_MINIONS
+                for i in range(num_offered):
+                    tav.minions.append(mn.get_rand_minion(tav.tier))
+        elif self.state == State.tavern_planning:
+            self.open_tavern(constant.INITIAL_TIMER + self.round * 5) 
+            
+        self.handle_events()
+
+    def open_tavern(self, tav_time):
+        end_time = time.time() + tav_time
+        ray_ids = {}
+        for client in self.clients.values():
+            c_id = ray.get(client.get_id.remote())
+            tavern = self.players[c_id].tavern
+            ray_ids[client.use_tavern.remote(tavern, end_time)] = c_id
+        while time.time() < end_time:
+            ready_results, unready_results = ray.wait(list(ray_ids.keys()))
+            for i, result in enumerate(ready_results):
+                c_id = ray_ids[result]
+                tavern = self.players[c_id].tavern
+                del ray_ids[result]
+                self.events[self.state.value].append(ray.get(result))
+                client = self.clients[c_id]
+                ray_ids[client.use_tavern.remote(tavern, end_time)] = c_id
+
     def setup_clients(self, num_clients, is_ai):
         for i in range(num_clients):
             client = Client.remote(is_ai, Player.p_id)
@@ -59,37 +91,6 @@ class EventHandler:
         self.setup_clients(num_humans, False)
         self.setup_clients(num_ai, True)
         self.matchmaker = Matchmaker(self.players)
-
-    def setup_human_players(self, num_humans):
-        for player_num in range(num_humans):
-            print('PLAYER ' + str(player_num) + ':')
-            hero_choices = []
-            for i in range(0, 3):
-                hero_index = random.randint(0, len(Hero.valid_hero_dbfs) - 1)
-                hero_choices.append(Hero.valid_hero_dbfs[hero_index])
-                Hero.taken_hero_dbfs.append(Hero.valid_hero_dbfs[hero_index])
-                del Hero.valid_hero_dbfs[hero_index]
-            for i, dbf_id in enumerate(hero_choices):
-                print(str(i) + ': ' + Hero.hero_dict[dbf_id].name)
-            print('Enter number of hero you want to play: ')
-            chosen_index = int(input())
-    
-            new_player = Player('HuPlayer_' + str(Player.p_id), 
-             Hero.hero_dict[hero_choices[chosen_index]])
-            self.players[new_player.id] = new_player
-    
-    def setup_ai_players(self, num_ai):
-        for i in range(num_ai):
-            hero_index = random.randint(0, len(Hero.valid_hero_dbfs) - 1)
-            hero_dbf = Hero.valid_hero_dbfs[hero_index]
-            Hero.taken_hero_dbfs.append(hero_dbf)
-            del Hero.valid_hero_dbfs[hero_index]
-            new_player = Player('AIPlayer_' + str(Player.p_id), Hero.hero_dict[hero_dbf])
-            self.players[new_player.id] = new_player
-        #Add Kel'Thuzad to list
-        new_player = Player('Kel\'Thuzad', Hero.hero_dict[constant.KELTHUZAD_ID])
-        new_player.id = -1
-        self.kelthuzad = new_player
 
 class Matchmaker:
     def __init__(self, players):

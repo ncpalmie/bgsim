@@ -19,6 +19,7 @@ class Minion(object):
     token_dict = {}
     gold_min_dict = {}
     min_pool = []
+    reserved_pool = []
     def __init__(self, attack, cost, dbfId, health, m_id, mechanics,
      name, race, tech_level, text):
         self.attack = int(attack)
@@ -82,16 +83,21 @@ class Minion(object):
             elif minion.tech_level == 6:
                 Minion.min_pool.extend([minion.dbf_id] * constant.TIER_6_COPIES)
 
-def get_rand_minion(max_tier):
+def get_rand_minion(max_tier, reserve_minion=True):
+    minion_dbf = None
     if max_tier == 1:
-        return Minion.min_dict[Minion.min_pool[random.randint(0, constant.TIER_1_TOTAL)]]
+        minion_dbf = Minion.min_pool[random.randint(0, constant.TIER_1_INDEX)]
     elif max_tier == 2:
-        return Minion.min_dict[Minion.min_pool[random.randint(0, constant.TIER_1_2_TOTAL)]]
+        minion_dbf = Minion.min_pool[random.randint(0, constant.TIER_2_INDEX)]
     elif max_tier == 3:
-        return Minion.min_dict[Minion.min_pool[random.randint(0, constant.TIER_1_3_TOTAL)]]
+        minion_dbf = Minion.min_pool[random.randint(0, constant.TIER_3_INDEX)]
     elif max_tier == 4:
-        return Minion.min_dict[Minion.min_pool[random.randint(0, constant.TIER_1_4_TOTAL)]]
+        minion_dbf = Minion.min_pool[random.randint(0, constant.TIER_4_INDEX)]
     elif max_tier == 5:
-        return Minion.min_dict[Minion.min_pool[random.randint(0, constant.TIER_1_5_TOTAL)]]
+        minion_dbf = Minion.min_pool[random.randint(0, constant.TIER_5_INDEX)]
     else:
-        return Minion.min_dict[Minion.min_pool[random.randint(0, constant.TIER_1_6_TOTAL)]]
+        minion_dbf = Minion.min_pool[random.randint(0, constant.TIER_6_INDEX)]
+    if reserve_minion:
+        Minion.min_pool.remove(minion_dbf)
+        Minion.reserved_pool.append(minion_dbf)
+    return Minion.min_dict[minion_dbf]

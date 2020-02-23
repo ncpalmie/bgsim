@@ -1,4 +1,4 @@
-import random
+import random, sys
 import constant
 import ray
 from player import Player
@@ -22,11 +22,21 @@ else:
     print('Input number of human players: ')
     num_humans = int(input())
 
+state_args = []
 event_handler = EventHandler()
-event_handler.setup_players(num_humans, num_players - num_humans)
+state_args.append(num_humans)
+state_args.append(num_players - num_humans)
+
+event_handler.run_state(state_args)
+event_handler.enter_next_state()
+while True:
+    event_handler.run_state()
+    event_handler.enter_next_state()
+    if event_handler.state.value == 3:
+        print('Tavern end')
+        sys.exit()
+
 
 for player in event_handler.players.values():
     print(player)
-
-
 
