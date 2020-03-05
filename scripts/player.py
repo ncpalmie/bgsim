@@ -10,11 +10,11 @@ class Player:
             self.is_ai = False
         else:
             self.is_ai = True
-        self.coins = 3
         self.health = 0
         self.triples = 0
         self.winstreak = 0
         self.minions = []
+        self.hand = []
         self.num_minions = 0
         self.tavern = Tavern()
         self.prev_opps = [None, None]

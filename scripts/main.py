@@ -1,4 +1,4 @@
-import random, sys
+import random, sys, time
 import constant
 import ray
 from player import Player
@@ -33,10 +33,8 @@ while True:
     event_handler.run_state()
     event_handler.enter_next_state()
     if event_handler.state.value == 3:
-        print('Tavern end')
+        print('TAVERN END ' + str(time.time() - event_handler.debug_time)[:6])
+        for player in event_handler.players.values():
+            print(player.hand)
         sys.exit()
-
-
-for player in event_handler.players.values():
-    print(player)
 

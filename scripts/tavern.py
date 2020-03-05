@@ -6,4 +6,5 @@ class Tavern:
         self.tier = 1
         self.ref_cost = 1
         self.min_cost = 3
+        self.coins = 3
 

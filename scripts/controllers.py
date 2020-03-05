@@ -10,12 +10,12 @@ from minion import Minion
 
 class State(enum.Enum):
     game_start = 0
-    tavern_start = 1
-    tavern_planning = 2
-    tavern_end = 3
-    combat_start = 4
-    combat = 5
-    combat_end = 6
+    t_start = 1
+    t_plan = 2
+    t_end = 3
+    c_start = 4
+    c_sim = 5
+    c_end = 6
     game_end = 7
 
 class EventHandler:
@@ -29,6 +29,7 @@ class EventHandler:
         self.round = 0
         self.kelthuzad = None
         self.matchmaker = None
+        self.debug_time = time.time()
 
     def enter_next_state(self):
         self.state = State(self.state.value + 1)
@@ -36,16 +37,20 @@ class EventHandler:
     def handle_events(self):
         event_list = self.events[self.state.value]
         while len(event_list) > 0:
-            #Continue after minions are done
-            event_list.pop(0)
-            pass
+            next_event = event_list.pop(0)
+            if next_event.event_type == Event_Type.buy:
+                ref_player = self.players[next_event.on_player]
+                bought_min = ref_player.tavern.minions.pop(next_event.target)
+                ref_player.hand.append(bought_min)
+                ref_player.tavern.coins -= ref_player.tavern.min_cost
+                self.players[next_event.on_player] = ref_player
 
     def run_state(self, args_list=[]):
         if self.state == State.game_start:
             #Arg 1: Number of human players
             #Arg 2: Number of AI players
             self.setup_players(args_list[0], args_list[1])
-        elif self.state == State.tavern_start:
+        elif self.state == State.t_start:
             for player in self.players.values():
                 tav = player.tavern
                 if tav.frozen:
@@ -53,27 +58,32 @@ class EventHandler:
                 num_offered = math.ceil(tav.tier / 2) + constant.OFFERED_MINIONS
                 for i in range(num_offered):
                     tav.minions.append(mn.get_rand_minion(tav.tier))
-        elif self.state == State.tavern_planning:
+        elif self.state == State.t_plan:
             self.open_tavern(constant.INITIAL_TIMER + self.round * 5) 
             
-        self.handle_events()
-
     def open_tavern(self, tav_time):
         end_time = time.time() + tav_time
         ray_ids = {}
         for client in self.clients.values():
             c_id = ray.get(client.get_id.remote())
             tavern = self.players[c_id].tavern
-            ray_ids[client.use_tavern.remote(tavern, end_time)] = c_id
+            print('OPEN TAVERN SEND NOW TO CLIENT ' + str(c_id) + ' ' + str(time.time() - self.debug_time)[:6])
+            ray_ids[client.use_tavern.remote(tavern, end_time, self.debug_time)] = c_id
         while time.time() < end_time:
-            ready_results, unready_results = ray.wait(list(ray_ids.keys()))
+            if time.time() * 1000 % constant.TAV_REFRESH_RATE != 0:
+                continue
+            ready_results, unready_results = ray.wait(list(ray_ids.keys()), len(list(ray_ids.keys())))
             for i, result in enumerate(ready_results):
                 c_id = ray_ids[result]
                 tavern = self.players[c_id].tavern
                 del ray_ids[result]
-                self.events[self.state.value].append(ray.get(result))
+                for event in ray.get(result):
+                    if not event in self.events[self.state.value]:
+                        self.events[self.state.value].append(event)
+                self.handle_events()
                 client = self.clients[c_id]
-                ray_ids[client.use_tavern.remote(tavern, end_time)] = c_id
+                print('TAVERN RESEND NOW TO CLIENT ' + str(c_id) + ' ' + str(time.time() - self.debug_time)[:6])
+                ray_ids[client.use_tavern.remote(tavern, end_time, self.debug_time)] = c_id
 
     def setup_clients(self, num_clients, is_ai):
         for i in range(num_clients):
