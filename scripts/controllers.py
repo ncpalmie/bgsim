@@ -7,6 +7,7 @@ from hero import Hero
 from player import Player
 from event import Event, Event_Type
 from minion import Minion
+from minion import BoardMinion
 
 class State(enum.Enum):
     game_start = 0
@@ -43,7 +44,11 @@ class EventHandler:
                 bought_min = ref_player.tavern.minions.pop(next_event.target)
                 ref_player.hand.append(bought_min)
                 ref_player.tavern.coins -= ref_player.tavern.min_cost
-                self.players[next_event.on_player] = ref_player
+            if next_event.event_type == Event_Type.play:
+                ref_player = self.players[next_event.on_player]
+                card = ref_player.hand.pop(next_event.target)
+                board_min = BoardMinion(card.attack, card.health, 0, card)
+                ref_player.minions.append(board_min)
 
     def run_state(self, args_list=[]):
         if self.state == State.game_start:
