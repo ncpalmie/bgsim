@@ -18,17 +18,46 @@ class HumanLogic:
             return True
         return False
 
-    def next_tav_event(self, tavern, end_time):
-        #print('TIME LEFT: ' + str(end_time - time.time()) + ' seconds')
-        #print('Minions for sale:')
+    def next_tav_event(self, tavern, hand, minions, end_time):
+        print('TIME LEFT: ' + str(end_time - time.time()) + ' seconds')
+        print('====================================')
+        print('Minions for sale:')
         for i, minion in enumerate(tavern.minions):
             print(str(i) + ': ' + minion.name)
-        #print('Buy minion? Enter \'y\' for yes: ')
-        if not HumanLogic.is_time_left(end_time):
-            return None
-        if input().lower() == 'y':
-            #print('Enter minion number: ')
+        if tavern.coins >= tavern.min_cost: 
+            print('Buy minion? Enter \'y\' for yes: ')
             if not HumanLogic.is_time_left(end_time):
                 return None
-            buy_index = int(input())
-            return Event(Event_Type.buy, buy_index)
+            if input().lower() == 'y':
+                print('Enter minion number: ')
+                if not HumanLogic.is_time_left(end_time):
+                    return None
+                buy_index = int(input())
+                return Event(Event_Type.buy, buy_index)
+        print('Not enough coins to play a minion.')
+        print('====================================')
+        print('Hand:')
+        for i, minion in enumerate(hand):
+            print(str(i) + ': ' + minion.name)
+        if len(minions) <= 7 and len(hand) >= 1:
+            print('Play minion? Enter \'y\' for yes: ')
+            if not HumanLogic.is_time_left(end_time):
+                return None
+            if input().lower() == 'y':
+                #Play minion to board code
+                pass
+        print('====================================')
+        print('Board:')
+        for i, minion in enumerate(minions):
+            print(str(i) + ': ' + minion.name)
+        if len(minions) >= 1:
+            print('Alter board? Enter \'y\' for yes: ')
+            if not HumanLogic.is_time_left(end_time):
+                return None
+            if input().lower() == 'y':
+                #Alter board code
+                pass
+        print('====================================')
+        return None
+            
+            

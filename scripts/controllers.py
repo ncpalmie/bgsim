@@ -67,8 +67,10 @@ class EventHandler:
         for client in self.clients.values():
             c_id = ray.get(client.get_id.remote())
             tavern = self.players[c_id].tavern
-            print('OPEN TAVERN SEND NOW TO CLIENT ' + str(c_id) + ' ' + str(time.time() - self.debug_time)[:6])
-            ray_ids[client.use_tavern.remote(tavern, end_time, self.debug_time)] = c_id
+            hand = self.players[c_id].hand
+            minions = self.players[c_id].minions
+            #print('OPEN TAVERN SEND NOW TO CLIENT ' + str(c_id) + ' ' + str(time.time() - self.debug_time)[:6])
+            ray_ids[client.use_tavern.remote(tavern, hand, minions, end_time, self.debug_time)] = c_id
         while time.time() < end_time:
             if time.time() * 1000 % constant.TAV_REFRESH_RATE != 0:
                 continue
@@ -76,14 +78,16 @@ class EventHandler:
             for i, result in enumerate(ready_results):
                 c_id = ray_ids[result]
                 tavern = self.players[c_id].tavern
+                hand = self.players[c_id].hand
+                minions = self.players[c_id].minions
                 del ray_ids[result]
                 for event in ray.get(result):
                     if not event in self.events[self.state.value]:
                         self.events[self.state.value].append(event)
                 self.handle_events()
                 client = self.clients[c_id]
-                print('TAVERN RESEND NOW TO CLIENT ' + str(c_id) + ' ' + str(time.time() - self.debug_time)[:6])
-                ray_ids[client.use_tavern.remote(tavern, end_time, self.debug_time)] = c_id
+                #print('TAVERN RESEND NOW TO CLIENT ' + str(c_id) + ' ' + str(time.time() - self.debug_time)[:6])
+                ray_ids[client.use_tavern.remote(tavern, hand, minions, end_time, self.debug_time)] = c_id
 
     def setup_clients(self, num_clients, is_ai):
         for i in range(num_clients):

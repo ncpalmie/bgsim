@@ -24,20 +24,17 @@ class Client(object):
             return True
         return False
 
-    def use_tavern(self, tavern, end_time, debug_time):
-        print('CLIENT ' + str(self.id) + ' RECEIVED TAVERN ' + str(time.time() - debug_time)[:6])
+    def use_tavern(self, tavern, hand, minions, end_time, debug_time):
+        #print('CLIENT ' + str(self.id) + ' RECEIVED TAVERN ' + str(time.time() - debug_time)[:6])
         self.events_made = []
         while len(self.events_made) == 0 and Client.is_time_left(end_time):
-            if tavern.coins >= tavern.min_cost:
-                ret_event = self.logic.next_tav_event(tavern, end_time)
-            else:
-                ret_event = None
+            ret_event = self.logic.next_tav_event(tavern, hand, minions, end_time)
             if ret_event == None:
                 break
             else:
                 ret_event.on_player = self.id
                 self.events_made.append(ret_event)
-        print('CLIENT ' + str(self.id) + ' FINISHED TAVERN ' + str(time.time() - debug_time)[:6])
+        #print('CLIENT ' + str(self.id) + ' FINISHED TAVERN ' + str(time.time() - debug_time)[:6])
         return self.events_made
                 
     def select_hero(self, hero_choices):
