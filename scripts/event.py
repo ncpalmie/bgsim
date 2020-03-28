@@ -4,10 +4,11 @@ class Event_Type(enum.Enum):
     buy = 0
     sell = 1
     play = 2
+    end = 4
 
 class Event:
     e_id = 0
-    def __init__(self, ev_type, target, subtargets=None, on_player=None, actions=None):
+    def __init__(self, ev_type, target=None, subtargets=None, on_player=None, actions=None):
         self.e_id = Event.e_id
         self.event_type = ev_type
         self.target = target
@@ -40,4 +41,7 @@ Play:
     Need actions which should be input after event is returned to main client
     return Event(Event_Type.play, hand_index, pos_index)
         THEN ref_event.actions = Minion.get_min_events(hand[hand_index])
+End:
+    Needs no extra arguments
+    return Event(Event_Type.end)
 '''

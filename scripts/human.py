@@ -34,46 +34,58 @@ class HumanLogic:
         for i, minion in enumerate(hand):
             print(str(i) + ': ' + minion.name)
         print('====================================')
-        if tavern.coins >= tavern.min_cost: 
-            print('Buy minion? Enter \'b\' for yes: ')
+        print('Enter \'b\' to buy a minion, \'s\' to sell a minion, \n')
+        print('\'p\' to play a minion, \'a\' to alter the board, or \'e\' to end your turn early:')
+        if not HumanLogic.is_time_left(end_time):
+            return None
+        
+        choice = input().lower()
+
+        while choice != 'e':
+            if choice == 'b':
+                return self.buy_action(tavern, end_time)
+            if choice == 's':
+                return self.sell_action(minions, end_time)
+            if choice == 'p':
+                return self.play_action(minions, hand, end_time)
+            if choice == 'a':
+                return self.alter_action(minions, end_time)
+            print('Enter \'b\' to buy a minion, \'s\' to sell a minion,')
+            print('\'p\' to play a minion, \'a\' to alter the board, or \'e\' to end your turn early:')
             if not HumanLogic.is_time_left(end_time):
                 return None
-            if input().lower() == 'b':
-                print('Enter minion number in tavern: ')
-                if not HumanLogic.is_time_left(end_time):
-                    return None
-                buy_index = int(input())
-                return Event(Event_Type.buy, buy_index)
+            choice = input().lower()
+
+        return Event(Event_Type.end)
+            
+    def buy_action(self, tavern, end_time):
+        if tavern.coins >= tavern.min_cost: 
+            print('Enter minion number in tavern: ')
+            if not HumanLogic.is_time_left(end_time):
+                return None
+            buy_index = int(input())
+            return Event(Event_Type.buy, buy_index)
         else:
             print('Not enough coins to buy a minion.')
-        if len(minions) >= 1:
-            print('Sell minion? Enter \'s\' for yes:')
+
+    def play_action(self, minions, hand, end_time):
+        if len(minions) <= 7 and len(hand) >= 1:
+            print('Enter minion number in hand: ')
             if not HumanLogic.is_time_left(end_time):
                 return None
-            if input().lower() == 's':
-                #Play minion to board code
-                pass
+            play_index = int(input())
+            return Event(Event_Type.play, play_index)
+        else:
+            print ('No cards to play/board space to place a minion.')
+
+    def sell_action(self, minions, end_time):
+        if len(minions) >= 1:
+            pass
         else:
             print('No minions to sell.')
-        if len(minions) <= 7 and len(hand) >= 1:
-            print('Play minion? Enter \'p\' for yes: ')
-            if not HumanLogic.is_time_left(end_time):
-                return None
-            if input().lower() == 'p':
-                #Play minion to board code
-                print('Enter minion number in hand: ')
-                if not HumanLogic.is_time_left(end_time):
-                    return None
-                play_index = int(input())
-                return Event(Event_Type.play, play_index)
+
+    def alter_action(self, minions, end_time):
         if len(minions) >= 1:
-            print('Alter board? Enter \'a\' for yes: ')
-            if not HumanLogic.is_time_left(end_time):
-                return None
-            if input().lower() == 'a':
-                #Alter board code
-                pass
-        print('====================================')
-        return None
-            
-            
+            pass
+        else:
+            print('Nothing on board to alter.')
