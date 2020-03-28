@@ -44,11 +44,16 @@ class EventHandler:
                 bought_min = ref_player.tavern.minions.pop(next_event.target)
                 ref_player.hand.append(bought_min)
                 ref_player.tavern.coins -= ref_player.tavern.min_cost
-            if next_event.event_type == Event_Type.play:
+            elif next_event.event_type == Event_Type.play:
                 ref_player = self.players[next_event.on_player]
                 card = ref_player.hand.pop(next_event.target)
                 board_min = BoardMinion(card.attack, card.health, 0, card)
                 ref_player.minions.append(board_min)
+            elif next_event.event_type == Event_Type.sell:
+                ref_player = self.players[next_event.on_player]
+                minion = ref_player.minions.pop(next_event.target)
+                #Check if minion had on board effects, alter other minions accordingly
+                ref_player.tavern.coins += 1
 
     def run_state(self, args_list=[]):
         if self.state == State.game_start:

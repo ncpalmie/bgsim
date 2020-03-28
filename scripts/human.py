@@ -34,7 +34,7 @@ class HumanLogic:
         for i, minion in enumerate(hand):
             print(str(i) + ': ' + minion.name)
         print('====================================')
-        print('Enter \'b\' to buy a minion, \'s\' to sell a minion, \n')
+        print('Enter \'b\' to buy a minion, \'s\' to sell a minion,')
         print('\'p\' to play a minion, \'a\' to alter the board, or \'e\' to end your turn early:')
         if not HumanLogic.is_time_left(end_time):
             return None
@@ -76,11 +76,15 @@ class HumanLogic:
             play_index = int(input())
             return Event(Event_Type.play, play_index)
         else:
-            print ('No cards to play/board space to place a minion.')
+            print ('No cards to play and/or board space to place a minion.')
 
     def sell_action(self, minions, end_time):
         if len(minions) >= 1:
-            pass
+            print('Enter minion number on board: ')
+            if not HumanLogic.is_time_left(end_time):
+                return None
+            sell_index = int(input())
+            return Event(Event_Type.sell, sell_index)
         else:
             print('No minions to sell.')
 

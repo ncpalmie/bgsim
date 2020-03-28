@@ -13,6 +13,7 @@ class Basic_AI:
 
     def next_tav_event(self, tavern, hand, minions, end_time):
         if len(tavern.minions) > 0 and tavern.coins >= tavern.min_cost:
+            print('BUY AT ' + str(end_time))
             buy_index = random.randint(0, len(tavern.minions) - 1)
             tavern.minions.pop(buy_index)
             tavern.coins -= tavern.min_cost
